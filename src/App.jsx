@@ -1,22 +1,15 @@
 import { calculateInvestmentResults, formatter } from './util/investment.js';
 import React, { useState } from 'react';
-
-function Header() {
-  return (
-    <header id="header">
-      <img src="investment-calculator-logo.png" alt="React Logo" />
-      <h1>React Investment Calculator</h1>
-    </header>
-  );
-}
+import Header from './components/Header.jsx';
 
 function InvestmentForm({ inputValues, setInputValues }) {
   function handleInputChange(e, input) {
-    console.log(e.target.value, input);
-    setInputValues((prevValues) => ({
-      ...prevValues,
-      [input]: Number(e.target.value),
-    }));
+    setInputValues((inputValues) => {
+      return {
+        ...inputValues,
+        [input]: Number(e.target.value),
+      };
+    });
   }
 
   return (
@@ -27,16 +20,20 @@ function InvestmentForm({ inputValues, setInputValues }) {
             <label>Initial Investment</label>
             <input
               type="number"
+              value={inputValues.initialInvestment}
+              required
               placeholder="Initial Investment"
-              onChange={(e) => handleInputChange(e, 'input1')}
+              onChange={(e) => handleInputChange(e, 'initialInvestment')}
             />
           </div>
           <div>
             <label>Annual Investment</label>
             <input
               type="number"
+              value={inputValues.annualInvestment}
+              required
               placeholder="Annual Investment"
-              onChange={(e) => handleInputChange(e, 'input2')}
+              onChange={(e) => handleInputChange(e, 'annualInvestment')}
             />
           </div>
         </div>
@@ -45,16 +42,20 @@ function InvestmentForm({ inputValues, setInputValues }) {
             <label>Expected Return</label>
             <input
               type="number"
+              value={inputValues.expectedReturn}
+              required
               placeholder="Expected return"
-              onChange={(e) => handleInputChange(e, 'input3')}
+              onChange={(e) => handleInputChange(e, 'expectedReturn')}
             />
           </div>
           <div>
             <label>duration</label>
             <input
               type="number"
+              value={inputValues.duration}
+              required
               placeholder="Duration"
-              onChange={(e) => handleInputChange(e, 'input4')}
+              onChange={(e) => handleInputChange(e, 'duration')}
             />
           </div>
         </div>
@@ -99,27 +100,32 @@ function TableFullBody({ tableListValue }) {
 
 function App() {
   const [inputValues, setInputValues] = useState({
-    input1: '',
-    input2: '',
-    input3: '',
-    input4: '',
+    initialInvestment: 10000,
+    annualInvestment: 1200,
+    expectedReturn: 6,
+    duration: 10,
   });
 
+  const isValid = inputValues.duration >= 1;
+
   const result = calculateInvestmentResults({
-    initialInvestment: inputValues.input1 || 0,
-    annualInvestment: inputValues.input2 || 0,
-    expectedReturn: inputValues.input3 || 0,
-    duration: inputValues.input4 || 0,
+    initialInvestment: inputValues.initialInvestment,
+    annualInvestment: inputValues.annualInvestment,
+    expectedReturn: inputValues.expectedReturn,
+    duration: inputValues.duration,
   });
 
   return (
     <>
       <Header />;
       <InvestmentForm
-        inputValues={inputValues}
         setInputValues={setInputValues}
+        inputValues={inputValues}
       />
-      <TableFullBody tableListValue={result} />
+      {!isValid && (
+        <p className="center">Duration not equal zero and less zero.</p>
+      )}
+      {isValid && <TableFullBody tableListValue={result} />}
     </>
   );
 }
